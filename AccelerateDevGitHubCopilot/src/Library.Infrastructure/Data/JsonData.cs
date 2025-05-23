@@ -109,23 +109,15 @@ public class JsonData
             ImageName = p.ImageName,
             MembershipStart = p.MembershipStart,
             MembershipEnd = p.MembershipEnd,
-            Loans = new List<Loan>(),
+            Loans = Loans!.Where(loan => loan.PatronId == p.Id).Select(GetPopulatedLoan).ToList(),
         };
-
-        foreach (Loan loan in Loans!)
-        {
-            if (loan.PatronId == p.Id)
-            {
-                populated.Loans.Add(GetPopulatedLoan(loan));
-            }
-        }
 
         return populated;
     }
 
     public Loan GetPopulatedLoan(Loan l)
     {
-        Loan populated = new Loan
+        var populated = new Loan
         {
             Id = l.Id,
             BookItemId = l.BookItemId,
@@ -133,54 +125,36 @@ public class JsonData
             LoanDate = l.LoanDate,
             DueDate = l.DueDate,
             ReturnDate = l.ReturnDate,
+            BookItem =
+                BookItems != null
+                    ? GetPopulatedBookItem(BookItems.FirstOrDefault(bi => bi.Id == l.BookItemId)!)
+                    : null,
+            Patron = Patrons?.FirstOrDefault(p => p.Id == l.PatronId),
         };
-
-        foreach (BookItem bi in BookItems!)
-        {
-            if (bi.Id == l.BookItemId)
-            {
-                populated.BookItem = GetPopulatedBookItem(bi);
-                break;
-            }
-        }
-
-        foreach (Patron p in Patrons!)
-        {
-            if (p.Id == l.PatronId)
-            {
-                populated.Patron = p;
-                break;
-            }
-        }
 
         return populated;
     }
 
     public BookItem GetPopulatedBookItem(BookItem bi)
     {
-        BookItem populated = new BookItem
+        var populated = new BookItem
         {
             Id = bi.Id,
             BookId = bi.BookId,
             AcquisitionDate = bi.AcquisitionDate,
             Condition = bi.Condition,
+            Book =
+                Books != null
+                    ? GetPopulatedBook(Books.FirstOrDefault(b => b.Id == bi.BookId)!)
+                    : null,
         };
-
-        foreach (Book b in Books!)
-        {
-            if (b.Id == bi.BookId)
-            {
-                populated.Book = GetPopulatedBook(b);
-                break;
-            }
-        }
 
         return populated;
     }
 
     public Book GetPopulatedBook(Book b)
     {
-        Book populated = new Book
+        var populated = new Book
         {
             Id = b.Id,
             Title = b.Title,
@@ -188,16 +162,14 @@ public class JsonData
             Genre = b.Genre,
             ISBN = b.ISBN,
             ImageName = b.ImageName,
+            Author =
+                Authors != null
+                    ? Authors
+                        .Where(a => a.Id == b.AuthorId)
+                        .Select(a => new Author { Id = a.Id, Name = a.Name })
+                        .FirstOrDefault()
+                    : null,
         };
-
-        foreach (Author a in Authors!)
-        {
-            if (a.Id == b.AuthorId)
-            {
-                populated.Author = new Author { Id = a.Id, Name = a.Name };
-                break;
-            }
-        }
 
         return populated;
     }
