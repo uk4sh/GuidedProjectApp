@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Library.ApplicationCore;
 using Library.Infrastructure.Data;
-using Library.ApplicationCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
 var configuration = new ConfigurationBuilder()
-.SetBasePath(Directory.GetCurrentDirectory())
-.AddJsonFile("appSettings.json")
-.Build();
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appSettings.json")
+    .Build();
 
 services.AddSingleton<IConfiguration>(configuration);
 

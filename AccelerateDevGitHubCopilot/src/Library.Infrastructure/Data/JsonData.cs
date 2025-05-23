@@ -58,7 +58,7 @@ public class JsonData
                 PatronId = l.PatronId,
                 LoanDate = l.LoanDate,
                 DueDate = l.DueDate,
-                ReturnDate = l.ReturnDate
+                ReturnDate = l.ReturnDate,
             };
             loanList.Add(loan);
         }
@@ -67,14 +67,19 @@ public class JsonData
 
     public async Task SavePatrons(IEnumerable<Patron> patrons)
     {
-        await SaveJson(_patronsPath, patrons.Select(p => new Patron
-        {
-            Id = p.Id,
-            Name = p.Name,
-            MembershipStart = p.MembershipStart,
-            MembershipEnd = p.MembershipEnd,
-            ImageName = p.ImageName,
-        }).ToList());
+        await SaveJson(
+            _patronsPath,
+            patrons
+                .Select(p => new Patron
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    MembershipStart = p.MembershipStart,
+                    MembershipEnd = p.MembershipEnd,
+                    ImageName = p.ImageName,
+                })
+                .ToList()
+        );
     }
 
     private async Task SaveJson<T>(string filePath, T data)
@@ -104,7 +109,7 @@ public class JsonData
             ImageName = p.ImageName,
             MembershipStart = p.MembershipStart,
             MembershipEnd = p.MembershipEnd,
-            Loans = new List<Loan>()
+            Loans = new List<Loan>(),
         };
 
         foreach (Loan loan in Loans!)
@@ -127,7 +132,7 @@ public class JsonData
             PatronId = l.PatronId,
             LoanDate = l.LoanDate,
             DueDate = l.DueDate,
-            ReturnDate = l.ReturnDate
+            ReturnDate = l.ReturnDate,
         };
 
         foreach (BookItem bi in BookItems!)
@@ -158,7 +163,7 @@ public class JsonData
             Id = bi.Id,
             BookId = bi.BookId,
             AcquisitionDate = bi.AcquisitionDate,
-            Condition = bi.Condition
+            Condition = bi.Condition,
         };
 
         foreach (Book b in Books!)
@@ -182,18 +187,14 @@ public class JsonData
             AuthorId = b.AuthorId,
             Genre = b.Genre,
             ISBN = b.ISBN,
-            ImageName = b.ImageName
+            ImageName = b.ImageName,
         };
 
         foreach (Author a in Authors!)
         {
             if (a.Id == b.AuthorId)
             {
-                populated.Author = new Author
-                {
-                    Id = a.Id,
-                    Name = a.Name
-                };
+                populated.Author = new Author { Id = a.Id, Name = a.Name };
                 break;
             }
         }
@@ -209,4 +210,10 @@ public class JsonData
         }
     }
 
+    public Book? SearchBookByTitle(string title)
+    {
+        return Books?.FirstOrDefault(b =>
+            b.Title.Equals(title, StringComparison.OrdinalIgnoreCase)
+        );
+    }
 }
